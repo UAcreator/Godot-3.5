@@ -1,0 +1,53 @@
+# This function animates the movement of a sprite taken from a TileMap cell to a specified end cell.
+# It calculates the start and end world positions based on the cell coordinates, retrieves the texture
+# for the tile ID of the start cell, creates a sprite with the texture, and animates the sprite's
+# movement using a Tween. Once the animation is completed, the TileMap cell is updated to the end position
+# and the sprite object is freed.
+
+# Parameters:
+# - startCell: The starting cell position (Vector2) from the TileMap.
+# - endCell: The target cell position (Vector2) to move the sprite to.
+
+# Required Variables:
+# - tilemap: A reference to the TileMap node.
+# - duration: The duration of the animation in seconds.
+# - tile_set: The TileSet associated with the TileMap.
+# - get_cell: A method to retrieve the tile ID from the TileMap.
+# - Sprite: The Sprite class for creating the animated sprite.
+# - Tween: The Tween class for animating the sprite's movement.
+# - map_to_world: A method to convert cell coordinates to world positions.
+
+func animate_cell_movement(startCell: Vector2, endCell: Vector2):
+    # Calculate the world positions of the start and end cells
+    var startWorldPos = tilemap.map_to_world(startCell)
+    var endWorldPos = tilemap.map_to_world(endCell)
+
+    # Get the tile ID from the start cell
+    var t_id = get_cell(startCell.x, startCell.y)
+    # Get the texture for the tile ID
+    var texture = tile_set.tile_get_texture(t_id)
+
+    # Create a new Sprite and assign the texture
+    var image = Sprite.new()
+    image.texture = texture
+
+    # Set the initial position of the sprite and add it as a child
+    image.position = startWorldPos
+    add_child(image)
+
+    # Create a new Tween object
+    var tween = Tween.new()
+    add_child(tween)
+
+    # Interpolate the position property of the sprite using the Tween
+    tween.interpolate_property(image, "position", startWorldPos, endWorldPos, duration, Tween.TRANS_LINEAR, Tween.EASE_OUT)
+    tween.start()
+
+    # Connect the "tween_completed" signal to the "_on_animation_completed" method
+    tween.connect("tween_completed", self, "_on_animation_completed", [image, endCell])
+
+func _on_animation_completed(image: Node2D, endCell: Vector2):
+    # Set the TileMap cell to the end position
+    tilemap.set_cellv(endCell, 1)
+    # Free the sprite object
+    image.queue_free()
