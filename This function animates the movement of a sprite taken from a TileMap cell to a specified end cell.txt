@@ -42,12 +42,3 @@ func animate_cell_movement(startCell: Vector2, endCell: Vector2):
     # Interpolate the position property of the sprite using the Tween
     tween.interpolate_property(image, "position", startWorldPos, endWorldPos, duration, Tween.TRANS_LINEAR, Tween.EASE_OUT)
     tween.start()
-
-    # Connect the "tween_completed" signal to the "_on_animation_completed" method
-    tween.connect("tween_completed", self, "_on_animation_completed", [image, endCell])
-
-func _on_animation_completed(image: Node2D, endCell: Vector2):
-    # Set the TileMap cell to the end position
-    tilemap.set_cellv(endCell, 1)
-    # Free the sprite object
-    image.queue_free()
