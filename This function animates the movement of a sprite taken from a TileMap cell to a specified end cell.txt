@@ -42,3 +42,9 @@ func animate_cell_movement(startCell: Vector2, endCell: Vector2):
     # Interpolate the position property of the sprite using the Tween
     tween.interpolate_property(image, "position", startWorldPos, endWorldPos, duration, Tween.TRANS_LINEAR, Tween.EASE_OUT)
     tween.start()
+    
+    while tween.is_active():
+        yield(get_tree().create_timer(0.1), "timeout")
+    
+    remove_child(image)
+    image.queue_free()
